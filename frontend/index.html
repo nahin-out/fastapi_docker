@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    nav {
+      margin-bottom: 20px;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    label {
+      display: block;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Profile Manager</h1>
+
+  <nav>
+    <button onclick="showPage('create')">Create New User</button>
+    <button onclick="showPage('show')">Show All Users</button>
+    <button onclick="showPage('update')">Update User</button>
+    <button onclick="showPage('delete')">Delete User</button>
+  </nav>
+
+  <!-- Create User -->
+  <section id="create" class="active">
+    <h2>Create New User</h2>
+    <label>Name: <input id="create-name" /></label>
+    <label>Age: <input id="create-age" type="number" /></label>
+    <label>Secret Name: <input id="create-secret" /></label>
+    <button onclick="createUser()">Submit</button>
+    <pre id="create-result"></pre>
+  </section>
+
+  <!-- Show Users -->
+  <section id="show">
+    <h2>All Users</h2>
+    <button onclick="fetchUsers()">Load Users</button>
+    <ul id="user-list"></ul>
+  </section>
+
+  <!-- Update User -->
+  <section id="update">
+    <h2>Update User</h2>
+    <label>User ID: <input id="update-id" type="number" /></label>
+    <label>Name: <input id="update-name" /></label>
+    <label>Age: <input id="update-age" type="number" /></label>
+    <label>Secret Name: <input id="update-secret" /></label>
+    <button onclick="updateUser()">Update</button>
+    <pre id="update-result"></pre>
+  </section>
+
+  <!-- Delete User -->
+  <section id="delete">
+    <h2>Delete User</h2>
+    <label>User ID: <input id="delete-id" type="number" /></label>
+    <button onclick="deleteUser()">Delete</button>
+    <pre id="delete-result"></pre>
+  </section>
+
+  <script>
+    const API = "http://localhost:8000";
+
+    function showPage(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    async function createUser() {
+      const res = await fetch(`${API}/create_new_user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: document.getElementById("create-name").value,
+          age: parseInt(document.getElementById("create-age").value),
+          secret_name: document.getElementById("create-secret").value,
+        }),
+      });
+      const data = await res.json();
+      document.getElementById("create-result").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function fetchUsers() {
+      const res = await fetch(`${API}/show_all_profiles`);
+      const users = await res.json();
+      const list = document.getElementById("user-list");
+      list.innerHTML = "";
+      users.forEach(user => {
+        const li = document.createElement("li");
+        li.textContent = `ID: ${user.id}, Name: ${user.name}, Age: ${user.age}, Secret: ${user.secret_name}`;
+        list.appendChild(li);
+      });
+    }
+
+    async function updateUser() {
+      const id = document.getElementById("update-id").value;
+      const res = await fetch(`${API}/userprofile/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: document.getElementById("update-name").value,
+          age: parseInt(document.getElementById("update-age").value),
+          secret_name: document.getElementById("update-secret").value,
+        }),
+      });
+      const data = await res.json();
+      document.getElementById("update-result").textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function deleteUser() {
+      const id = document.getElementById("delete-id").value;
+      const res = await fetch(`${API}/userprofile/${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      document.getElementById("delete-result").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
