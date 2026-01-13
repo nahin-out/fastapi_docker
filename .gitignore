@@ -17,3 +17,24 @@ frontend/node_modules/
 
 # VS Code settings (optional)
 .vscode/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+venv/
+prod-env/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Docker volumes
+postgres_data/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

@@ -45,7 +45,7 @@ def userprofile_update(user_id:int, user_update: UserProfileBase, session:
         if user_profile is None:
             raise HTTPException(status_code=404, detail="User not found")
         update_data= user_update.dict(exclude_unset=True)
-        for ls -akey, value in update_data.items():
+        for key, value in update_data.items():
             setattr(user_profile, key, value)
         session.commit()
         session.refresh(user_profile)
